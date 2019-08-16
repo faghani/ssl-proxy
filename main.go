@@ -14,7 +14,7 @@ import (
 
 func main() {
 	m := autocert.Manager{
-		Cache:  autocert.DirCache("./certs"),
+		Cache:  autocert.DirCache("/certs"),
 		Prompt: autocert.AcceptTOS,
 		HostPolicy: func(ctx context.Context, host string) error {
 			return nil

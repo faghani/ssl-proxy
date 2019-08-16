@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/vulcand/oxy/forward"
 	"github.com/vulcand/oxy/testutils"
@@ -22,12 +23,6 @@ func main() {
 
 	go func() {
 		HTTPHandler := m.HTTPHandler(serveHTTP())
-
-		// @TODO: redirect
-		// if isValidHost() {
-		// 	HTTPHandler = m.HTTPHandler(nil)
-		// }
-
 		http.ListenAndServe(":http", HTTPHandler)
 	}()
 
@@ -43,7 +38,7 @@ func main() {
 func serveHTTP() http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		forwarder, _ := forward.New(forward.PassHostHeader(true))
-		req.URL = testutils.ParseURI("http://localhost:63450")
+		req.URL = testutils.ParseURI(os.Getenv("PROXY_TO"))
 		res.Header().Set("Strict-Transport-Security", "max-age=86400; includeSubDomains")
 
 		forwarder.ServeHTTP(res, req)

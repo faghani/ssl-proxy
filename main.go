@@ -23,11 +23,14 @@ func main() {
 
 	go func() {
 		HTTPHandler := m.HTTPHandler(serveHTTP())
-		http.ListenAndServe(":http", HTTPHandler)
+		err := http.ListenAndServe(":80", HTTPHandler)
+		if err != nil {
+			log.Fatalf("could not serve http server: %s", err)
+		}
 	}()
 
 	s := &http.Server{
-		Addr:      ":https",
+		Addr:      ":443",
 		TLSConfig: &tls.Config{GetCertificate: m.GetCertificate},
 		Handler:   serveHTTP(),
 	}
@@ -42,5 +45,6 @@ func serveHTTP() http.Handler {
 		res.Header().Set("Strict-Transport-Security", "max-age=86400; includeSubDomains")
 
 		forwarder.ServeHTTP(res, req)
+		return
 	})
 }
